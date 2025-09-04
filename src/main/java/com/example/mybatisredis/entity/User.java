@@ -1,6 +1,5 @@
 package com.example.mybatisredis.entity;
 
-
 import lombok.Data;
 
 @Data
