@@ -1,4 +1,4 @@
-package com.example.mybatisredis.entity;
+package com.example.mybatisredis.domain;
 
 import lombok.Data;
 
