@@ -33,7 +33,7 @@ public class Result {
         return new Result(-1,"请求失败",null);
     }
 
-    public static Result fail(int code,String message){
-        return new Result(code,message,null);
+    public static Result fail(String message){
+        return new Result(-1,message,null);
     }
 }

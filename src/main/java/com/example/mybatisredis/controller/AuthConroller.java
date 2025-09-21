@@ -2,29 +2,28 @@ package com.example.mybatisredis.controller;
 
 
 import com.example.mybatisredis.common.Result;
-import com.example.mybatisredis.service.AuthService;
+import com.example.mybatisredis.dto.SignUpDTO;
+import com.example.mybatisredis.service.impl.AuthServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/login")
+@RequestMapping("/auth")
 @RestController
 public class AuthConroller {
 
     @Autowired
-    private AuthService authService;
+    private AuthServiceImpl authService;
 
 
     @RequestMapping("/login")
-    public Result login(@RequestParam("username") String username, @RequestParam("password") String password){
-        return authService.login(username,password);
+    public Result login(@RequestBody SignUpDTO sign){
+        return authService.login(sign);
     }
 
 
-    @RequestMapping("/signUp")
-    public Result signUp(@RequestParam("username") String username,@RequestParam("password") String password){
-        return authService.signUp(username,password);
+    @PostMapping("/signUp")
+    public Result signUp(@RequestBody SignUpDTO sign){
+        return authService.signUp(sign);
     }
 
 }

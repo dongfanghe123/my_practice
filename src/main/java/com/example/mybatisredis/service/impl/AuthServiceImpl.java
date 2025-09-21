@@ -3,37 +3,78 @@ package com.example.mybatisredis.service.impl;
 
 import com.example.mybatisredis.common.ExceptionEnum;
 import com.example.mybatisredis.common.Result;
-import com.example.mybatisredis.dao.AuthDao;
-import com.example.mybatisredis.domain.Auth;
-import com.example.mybatisredis.service.AuthService;
+import com.example.mybatisredis.dto.SignUpDTO;
+import com.example.mybatisredis.mapper.UserMapper;
+import com.example.mybatisredis.entity.User;
+import com.example.mybatisredis.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
-public class AuthServiceImpl implements AuthService {
+public class AuthServiceImpl  {
 
     @Autowired
-    private AuthDao authDao;
+    private UserMapper userMapper;
 
-    @Override
-    public Result login(String username, String password) {
+
+    /**
+     * 登录验证
+     * @param sign
+     * @return
+     */
+    public Result login(SignUpDTO sign) {
+        //1.根据用户名查询用户密码
+        if(sign.getUsername()==null||sign.getPassword()==null){
+            return Result.fail("用户名或者密码不能为空!");
+        }
+
+        User user = userMapper.queryByUsername(sign.getUsername());
+        if(user==null){
+            return Result.fail("当前用户未注册,请先注册!");
+        }else{
+
+            if(user.getPassword()!=sign.getPassword()){
+                return Result.fail("密码错误!");
+            }
+        }
+
+
         return null;
     }
 
-    @Override
-    public Result signUp(String username, String password) {
-        //登录逻辑
+
+    /**
+     * 用户注册
+     * @param signUpDTO
+     * @return
+     */
+    public Result signUp(SignUpDTO signUpDTO) {
+        //注册逻辑
         //1.判断用户名或者密码是否为空
-        if(null==username || null==password){
-            return Result.fail(ExceptionEnum.UNREASON_USERNAME_OR_PASSWORD.getCode(), ExceptionEnum.UNREASON_USERNAME_OR_PASSWORD.getMessage());
+        if(null==signUpDTO.getUsername() || null==signUpDTO.getPassword()){
+            return Result.fail("用户名或者密码不能为空!");
         }
 
         //2.判断用户名是否已存在
-        Auth auth = authDao.queryByUsername(username);
-        if(null!=auth){
-            return null;
+        User user = userMapper.queryByUsername(signUpDTO.getUsername());
+        if(user!=null){
+            return Result.fail("用户名已经存在!");
         }
 
-        return null;
+        user=new User();
+
+        //注册逻辑
+        user.setUsername(signUpDTO.getUsername());
+        user.setPassword(signUpDTO.getPassword());
+        user.setRegisterTime(LocalDateTime.now());
+
+        userMapper.save(user);
+
+
+        //注册成功
+        return Result.success("注册成功!");
+
     }
 }

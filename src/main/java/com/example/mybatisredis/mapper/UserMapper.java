@@ -1,0 +1,18 @@
+package com.example.mybatisredis.mapper;
+
+
+
+import com.example.mybatisredis.entity.User;
+import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
+
+@Mapper
+public interface UserMapper {
+
+    List<User> queryAll();
+
+    User queryByUsername(String username);
+
+    void save(User user);
+}
