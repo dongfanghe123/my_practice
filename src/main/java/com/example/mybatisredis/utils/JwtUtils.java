@@ -22,36 +22,36 @@ public class JwtUtils {
     private static final long EXPIRATION_TIME = 20;
 
     // 密钥（实际应用中应该从安全的地方获取，且保持足够复杂度）
-    private static final String SECRET_KEY="h6Ml8PoXk5vR2tS9qYw3uZ1x7cA4bD0eF2gH5jK8nM";
+    private static final String STR_KEY="h6Ml8PoXk5vR2tS9qYw3uZ1x7cA4bD0eF2gH5jK8nM";
 
-    // 生成密钥
-    private SecretKey getSigningKey() {
-        // 使用HMAC-SHA256算法，需要至少256位（32字节）的密钥
-        byte[] keyBytes = SECRET_KEY.getBytes();
-        return Keys.hmacShaKeyFor(keyBytes);
+    private static final  SecretKey SECRET_KEY;
+
+    static {
+        byte[] keyBytes = STR_KEY.getBytes();
+        SECRET_KEY=Keys.hmacShaKeyFor(keyBytes);
+
     }
-
-
 
     /**
      * 生成包含自定义声明的JWT令牌
      * @param claims 自定义声明
      * @return 生成的令牌
      */
-    public String generateToken(Map<String, Object> claims) {
+    public static String generateToken(Map<String, Object> claims) {
 
 
-        LocalDateTime now =LocalDateTime.now();
+        Date now =new Date();
+
+        Date expireTime=new Date(now.getTime()+EXPIRATION_TIME*60*1000);
 
         claims.put("issuedTime",now);
 
-        claims.put("expireTime",now.plusMinutes(EXPIRATION_TIME));
-
+        claims.put("expireTime",expireTime);
 
 
         return Jwts.builder()
                 .setClaims(claims)  // 设置自定义声明
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)  // 设置签名算法和密钥
+                .signWith(SECRET_KEY, SignatureAlgorithm.HS256)  // 设置签名算法和密钥
                 .compact();  // 生成令牌字符串
     }
 
@@ -72,7 +72,7 @@ public class JwtUtils {
      */
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())  // 设置签名密钥
+                .setSigningKey(SECRET_KEY)  // 设置签名密钥
                 .build()
                 .parseClaimsJws(token)  // 解析令牌
                 .getBody();  // 获取声明主体
@@ -109,7 +109,7 @@ public class JwtUtils {
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey())
+                    .setSigningKey(SECRET_KEY)
                     .build()
                     .parseClaimsJws(token);
             return !isTokenExpired(token);

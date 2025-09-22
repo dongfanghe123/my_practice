@@ -1,7 +1,5 @@
 package com.example.mybatisredis.service.impl;
 
-
-import com.example.mybatisredis.common.ExceptionEnum;
 import com.example.mybatisredis.common.Result;
 import com.example.mybatisredis.dto.SignUpDTO;
 import com.example.mybatisredis.mapper.UserMapper;
@@ -9,8 +7,10 @@ import com.example.mybatisredis.entity.User;
 import com.example.mybatisredis.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 
 @Service
 public class AuthServiceImpl  {
@@ -35,13 +35,18 @@ public class AuthServiceImpl  {
             return Result.fail("当前用户未注册,请先注册!");
         }else{
 
-            if(user.getPassword()!=sign.getPassword()){
+            if(!user.getPassword().equals(sign.getPassword())){
                 return Result.fail("密码错误!");
             }
         }
 
 
-        return null;
+        //2.生成token
+        HashMap claim=new HashMap();
+        claim.put("username",sign.getUsername());
+        String token = JwtUtils.generateToken(claim);
+
+        return Result.success(token);
     }
 
 

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class TestSchedule {
 
 
-    @Scheduled(fixedRate = 3000)
+//    @Scheduled(fixedRate = 3000)
     public void testSchedule(){
         LocalDateTime localDateTime=LocalDateTime.now();
 
